@@ -2,7 +2,7 @@ const select = document.getElementById("opcao-tipo");
 const jogadorSection = document.getElementById("jogador-selection");
 const timeSection = document.getElementById("time-selection");
 const nomeJogador = document.getElementById("input-jogador").value;
-const estatisticaSelecionada = document.getElementById("select-estatistica-jogador").value;
+const estatisticaSelecionadaJ = document.getElementById("select-estatistica-jogador").value;
 
 
 jogadorSection.style.display = "none";
@@ -28,9 +28,9 @@ const jogadorButton = jogadorSection.querySelector("button");
 
 jogadorButton.addEventListener("click", () => {
     const nomeJogador = jogadorSection.querySelector("input").value;
-    const estatisticaSelecionada = jogadorSection.querySelectorAll("select")[0].value;
+    const estatisticaSelecionadaJ = jogadorSection.querySelectorAll("select")[0].value;
 
-    console.log("Estatística selecionada:", estatisticaSelecionada);
+    console.log("Estatística selecionada:", estatisticaSelecionadaJ);
 
 
     fetch("http://127.0.0.1:5000/jogador", {
@@ -40,7 +40,7 @@ jogadorButton.addEventListener("click", () => {
         },
         body: JSON.stringify({
             nome: nomeJogador,
-            estatistica: estatisticaSelecionada
+            estatistica: estatisticaSelecionadaJ
         })
     })
     .then(response => response.json())

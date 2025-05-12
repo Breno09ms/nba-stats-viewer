@@ -88,7 +88,7 @@ def tov_grafico_contra_times(nome_atleta):
 
 
  #Função pegar PPG por temporada
-def ppg_per_season(nome_jogador,salvar_csv=False):
+def ppg_per_season(nome_jogador,salvar_csv=True):
     jogador = nba.stats.static.players.find_players_by_full_name(nome_jogador)
     if not jogador:
         print("Jogador não encontrado")
@@ -108,7 +108,7 @@ def ppg_per_season(nome_jogador,salvar_csv=False):
 
     #Salvar CSV
     if salvar_csv:
-        resultado.to_csv(f"{nome_jogador.replace(' ', '_')}_ppg_por_season.csv")
+        resultado.to_csv(f"{nome_jogador.replace(' ', '_')}_ppg_por_season.csv", index = False)
 
     return resultado.reset_index(drop=True)
 
