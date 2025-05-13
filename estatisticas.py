@@ -88,7 +88,7 @@ def tov_grafico_contra_times(nome_atleta):
 
 
  #Função pegar PPG por temporada
-def ppg_per_season(nome_jogador,salvar_csv=True):
+def ppg_per_season(nome_jogador,salvar_csv=False):
     jogador = nba.stats.static.players.find_players_by_full_name(nome_jogador)
     if not jogador:
         print("Jogador não encontrado")
@@ -114,20 +114,20 @@ def ppg_per_season(nome_jogador,salvar_csv=True):
 
 # Função gráfico PPG por temporada
 def ppg_grafico_season(nome_atleta, salvar_csv=False):
-    nome_atleta_csv = nome_atleta.replace(" ", "_")
-    dataf = pd.read_csv(f"{nome_atleta_csv}_ppg_por_season.csv")
+    dataf = ppg_per_season(nome_atleta)    
 
     # Ordenar cronologicamente pelas temporadas
     dataf["ANO_INICIAL"] = dataf["SEASON_ID"].apply(lambda x: int(x[:4]))
     dataf = dataf.sort_values("ANO_INICIAL")
 
     # Plot
-    mp.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
-    mp.xlabel("Temporada")
-    mp.ylabel("PPG")
-    mp.title(f"PPG por temporada - {nome_atleta}")
-    mp.xticks(rotation=45)
-    mp.grid(True)
-    mp.tight_layout()
-    mp.show()
-
+    fig, ax = mp.subplots()
+    ax.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
+    ax.xlabel("Temporada")
+    ax.ylabel("PPG")
+    ax.title(f"PPG por temporada - {nome_atleta}")
+    ax.xticks(rotation=45)
+    ax.grid(True)
+    ax.tight_layout()
+    ax.show()
+    return fig

@@ -54,6 +54,12 @@ jogadorButton.addEventListener("click", () => {
             respostaDiv.textContent = "Erro: " + data.erro;
         } else if (data.mensagem) {
             respostaDiv.textContent = data.mensagem;
+        } else if (data.imagem) {
+            const img = document.createElement("img");
+            img.src = "data:image/png;base64," + data.imagem;
+            img.alt = "Gráfico gerado";
+            img.style.maxWidth = "100%";
+            respostaDiv.appendChild(img);
         } else {
             const tabela = document.createElement("table");
             for (const [time, valor] of Object.entries(data)) {

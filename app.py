@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+import io
+import base64
 from flask_cors import CORS
 from estatisticas import media_pts_por_time, tov_por_time, ppg_per_season, ppg_grafico_season
 
@@ -41,6 +43,25 @@ def jogador():
 
     else:
         return jsonify({"erro": "Estatística não suportada"}), 400
+    
+@app.route("/grafico", methods=["POST"])
+def grafico():
+    data = request.get_json()
+    nome = data.get("nome")
+
+    if not nome:
+        return jsonify({"erro": "Nome ausente"}), 400
+
+    fig = ppg_grafico_season(nome)  # Certifique-se que essa função retorna o gráfico (fig)
+
+    # Converter imagem para base64
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    imagem_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    buf.close()
+
+    return jsonify({"imagem": imagem_base64})    
 
 if __name__ == "__main__":
     app.run(debug=True)
