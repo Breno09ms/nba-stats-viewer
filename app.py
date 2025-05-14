@@ -52,16 +52,12 @@ def grafico():
     if not nome:
         return jsonify({"erro": "Nome ausente"}), 400
 
-    fig = ppg_grafico_season(nome)  # Certifique-se que essa função retorna o gráfico (fig)
-
-    # Converter imagem para base64
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png")
-    buf.seek(0)
-    imagem_base64 = base64.b64encode(buf.read()).decode('utf-8')
-    buf.close()
-
-    return jsonify({"imagem": imagem_base64})    
+    try:
+        imagem_base64 = ppg_grafico_season(nome)  # Retorna o gráfico (sem plt.show())
+        return jsonify({"imagem": imagem_base64})
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+   
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as mp
+import matplotlib.pyplot as plt
 import nba_api as nba
+import io
+import base64
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.endpoints import playercareerstats
@@ -39,12 +41,12 @@ def grafico_contra_times(nome_atleta):
     if media_por_time is not None:
       dataf = media_por_time.reset_index()
       dataf.sort_values("OPPONENT", inplace=True)
-      mp.bar(dataf["OPPONENT"],dataf["PTS"])
-      mp.xlabel("teste x")
-      mp.ylabel("teste y")
-      mp.title("Teste Título")
-      mp.tight_layout()
-      mp.show()
+      plt.bar(dataf["OPPONENT"],dataf["PTS"])
+      plt.xlabel("teste x")
+      plt.ylabel("teste y")
+      plt.title("Teste Título")
+      plt.tight_layout()
+      plt.show()
 
 
 
@@ -79,12 +81,12 @@ def tov_grafico_contra_times(nome_atleta):
     if tovmedia_por_time is not None:
        dataf = tovmedia_por_time.reset_index()      
        dataf.sort_values("OPPONENT", inplace=True)
-       mp.bar(dataf["OPPONENT"],dataf["TOV"])
-       mp.xlabel("teste x")
-       mp.ylabel("teste y")
-       mp.title("Teste Título")
-       mp.tight_layout()
-       mp.show()
+       plt.bar(dataf["OPPONENT"],dataf["TOV"])
+       plt.xlabel("teste x")
+       plt.ylabel("teste y")
+       plt.title("Teste Título")
+       plt.tight_layout()
+       plt.show()
 
 
  #Função pegar PPG por temporada
@@ -121,13 +123,18 @@ def ppg_grafico_season(nome_atleta, salvar_csv=False):
     dataf = dataf.sort_values("ANO_INICIAL")
 
     # Plot
-    fig, ax = mp.subplots()
+    fig, ax = plt.subplots()
     ax.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
-    ax.xlabel("Temporada")
-    ax.ylabel("PPG")
-    ax.title(f"PPG por temporada - {nome_atleta}")
-    ax.xticks(rotation=45)
+    ax.set_xlabel("Temporada")
+    ax.set_ylabel("PPG")
+    ax.set_title(f"PPG por temporada - {nome_atleta}")
+    plt.xticks(rotation=45)
     ax.grid(True)
-    ax.tight_layout()
-    ax.show()
-    return fig
+    fig.tight_layout()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)  # Fecha a figura para liberar memória
+    return imagem_base64
