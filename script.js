@@ -42,7 +42,8 @@ jogadorButton.addEventListener("click", () => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                nome: nomeJogador
+                nome: nomeJogador,
+                tipo:"jogador"
             })
         })
         .then(response => response.json())
@@ -112,13 +113,15 @@ timeButton.addEventListener("click", () => {
     const nomeTime = document.getElementById("select-time").value;
     const estatisticaTime = document.getElementById("select-estatistica-time").value;
 
-    fetch("http://127.0.0.1:5000/time", {
+    if (estatisticaTime === "vitorias_por_temporada"){
+    fetch("http://127.0.0.1:5000/grafico", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            time: nomeTime,
+            nome: nomeTime,
+            tipo: "time",
             estatistica: estatisticaTime
         })
     })
@@ -129,28 +132,17 @@ timeButton.addEventListener("click", () => {
         const respostaDiv = document.getElementById("resposta-servidor");
         respostaDiv.innerHTML = "";
 
-        if (data.erro) {
+        if (data.imagem) {
+            const img = document.createElement("img")
+            img.src = "data:image/png;base64," + data.imagem;
+            img.alt = "Gráfico de vitórias por temporada";
+            img.style.maxWidth = "100%";
+            respostaDiv.appendChild(img);
+        } else {           
             respostaDiv.textContent = "Erro: " + data.erro;
-        } else if (data.mensagem) {
-            respostaDiv.textContent = data.mensagem;
-        } else {
-            const tabela = document.createElement("table");
-            for (const [chave, valor] of Object.entries(data)) {
-                const linha = document.createElement("tr");
-
-                const colChave = document.createElement("td");
-                colChave.textContent = chave;
-
-                const colValor = document.createElement("td");
-                colValor.textContent = typeof valor === "number" ? valor.toFixed(2) : valor;
-
-                linha.appendChild(colChave);
-                linha.appendChild(colValor);
-                tabela.appendChild(linha);
-            }
-            respostaDiv.appendChild(tabela);
         }
     })
     .catch(error => console.error("Erro:", error));
+    }
 });
 

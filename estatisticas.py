@@ -5,8 +5,10 @@ import nba_api as nba
 import io
 import base64
 from nba_api.stats.static import players
+from nba_api.stats.static import teams
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import TeamYearByYearStats
 
 
 #Função pegar média de pontos contra cada time
@@ -100,7 +102,7 @@ def ppg_per_season(nome_jogador,salvar_csv=False):
     carreira = playercareerstats.PlayerCareerStats(player_id=player_id)
     df = carreira.get_data_frames()[0]
 
-    # 3. Filtrar só temporadas da temporada regular
+    #Filtrar 
     df_regular = df[df["LEAGUE_ID"] == "00"]  # "00" = NBA
     df_regular = df_regular[df_regular["SEASON_ID"].str.contains("-")]
 
@@ -136,5 +138,47 @@ def ppg_grafico_season(nome_atleta, salvar_csv=False):
     fig.savefig(buf, format="png")
     buf.seek(0)
     imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
-    plt.close(fig)  # Fecha a figura para liberar memória
+    plt.close(fig)
     return imagem_base64
+
+# Função gráfico Vitórias Temporada Regular
+
+def win_seasons(nome_time):
+    time = teams.find_teams_by_full_name(nome_time)
+    if not time:
+         print("Time não encontrado")
+         return
+    
+    team_id = time[0]["id"]
+    team_stats = TeamYearByYearStats(team_id=team_id)
+    df_regular = team_stats.get_data_frames()[0]
+
+    df_regular = df_regular[["YEAR","WINS","LOSSES"]]
+
+    fig, ax = plt.subplots()
+    plt.plot(df_regular["YEAR"],df_regular["WINS"])
+    ax.plot(df_regular["YEAR"],df_regular["LOSSES"], color="red")
+    plt.xlabel("TEMPORADA")
+    plt.ylabel("VITÓRIAS")
+    ax.set_xticks(ax.get_xticks()[::5])
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    ax.grid(axis="y")
+    
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig) 
+    return imagem_base64
+
+
+
+def win_ateams(nome_time):
+    time = teams.find_teams_by_full_name(nome_time)
+    
+    taotimoporhoje = 0
+    team_id = time(00)["id"]
+    return taotimoporhoje
+
+     

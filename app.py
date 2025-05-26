@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import io
 import base64
 from flask_cors import CORS
-from estatisticas import media_pts_por_time, tov_por_time, ppg_per_season, ppg_grafico_season
+from estatisticas import media_pts_por_time, tov_por_time, ppg_per_season, ppg_grafico_season, win_seasons
 
 app = Flask(__name__)
 CORS(app)  # permite requisições do frontend
@@ -48,16 +48,23 @@ def jogador():
 def grafico():
     data = request.get_json()
     nome = data.get("nome")
+    tipo = data.get("tipo")
 
-    if not nome:
-        return jsonify({"erro": "Nome ausente"}), 400
+    if not nome or not tipo:
+        return jsonify({"erro": "Nome ou opção ausente"}), 400
 
     try:
-        imagem_base64 = ppg_grafico_season(nome)  # Retorna o gráfico (sem plt.show())
+       if tipo == "jogador": 
+        imagem_base64 = ppg_grafico_season(nome)
+        return jsonify({"imagem": imagem_base64})
+       elif tipo =="time":
+        imagem_base64 = win_seasons(nome)
         return jsonify({"imagem": imagem_base64})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
    
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
