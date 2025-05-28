@@ -43,13 +43,19 @@ def grafico_contra_times(nome_atleta):
     if media_por_time is not None:
       dataf = media_por_time.reset_index()
       dataf.sort_values("OPPONENT", inplace=True)
-      plt.bar(dataf["OPPONENT"],dataf["PTS"])
-      plt.xlabel("teste x")
-      plt.ylabel("teste y")
-      plt.title("Teste Título")
+      fig, ax = plt.subplots(figsize=(12,6))
+      ax.bar(dataf["OPPONENT"],dataf["PTS"])
+      ax.set_xlabel("TIMES")
+      ax.set_ylabel("Número de PPG")
+      ax.set_title("Média de TOV contra cada time (Temporada Regular Atual)")
       plt.tight_layout()
-      plt.show()
 
+      buf = io.BytesIO()
+      fig.savefig(buf, format="png")
+      buf.seek(0)
+      imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+      plt.close(fig)
+      return imagem_base64
 
 
 #Função pegar média de Turnovers contra cada time
@@ -83,13 +89,19 @@ def tov_grafico_contra_times(nome_atleta):
     if tovmedia_por_time is not None:
        dataf = tovmedia_por_time.reset_index()      
        dataf.sort_values("OPPONENT", inplace=True)
-       plt.bar(dataf["OPPONENT"],dataf["TOV"])
-       plt.xlabel("teste x")
-       plt.ylabel("teste y")
-       plt.title("Teste Título")
+       fig, ax = plt.subplots(figsize=(12,6))
+       ax.bar(dataf["OPPONENT"],dataf["TOV"])
+       ax.set_xlabel("TIMES")
+       ax.set_ylabel("Número de Turnovers")
+       ax.set_title("Média de TOV contra cada time (Temporada Regular Atual)")
        plt.tight_layout()
-       plt.show()
 
+       buf = io.BytesIO()
+       fig.savefig(buf, format="png")
+       buf.seek(0)
+       imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+       plt.close(fig)
+       return imagem_base64
 
  #Função pegar PPG por temporada
 def ppg_per_season(nome_jogador,salvar_csv=False):
@@ -124,7 +136,7 @@ def ppg_grafico_season(nome_atleta, salvar_csv=False):
     dataf["ANO_INICIAL"] = dataf["SEASON_ID"].apply(lambda x: int(x[:4]))
     dataf = dataf.sort_values("ANO_INICIAL")
 
-    # Plot
+    
     fig, ax = plt.subplots()
     ax.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
     ax.set_xlabel("Temporada")

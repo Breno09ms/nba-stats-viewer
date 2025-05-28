@@ -35,7 +35,6 @@ jogadorButton.addEventListener("click", () => {
     console.log("Estatística selecionada:", estatisticaSelecionadaJ);
 
     if (estatisticaSelecionadaJ === "ppg_grafico") {
-        // Chama o endpoint do gráfico
         fetch("http://127.0.0.1:5000/grafico", {
             method: "POST",
             headers: {
@@ -43,7 +42,68 @@ jogadorButton.addEventListener("click", () => {
             },
             body: JSON.stringify({
                 nome: nomeJogador,
-                tipo:"jogador"
+                tipo:"jogador",
+                opt:"ppg_grafico"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+
+             console.log(data)
+
+            if (data.imagem) {
+                const img = document.createElement("img");
+                img.src = "data:image/png;base64," + data.imagem;
+                img.alt = "Gráfico gerado";
+                img.style.maxWidth = "100%";
+                respostaDiv.appendChild(img);
+            } else {
+                respostaDiv.textContent = "Erro: " + data.erro;
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao buscar gráfico:", error);
+        });
+    } else if(estatisticaSelecionadaJ === "media_tov_ctime") {
+      fetch("http://127.0.0.1:5000/grafico", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nome: nomeJogador,
+                tipo:"jogador",
+                opt: "media_tov_ctime"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+
+             console.log(data)
+
+            if (data.imagem) {
+                const img = document.createElement("img");
+                img.src = "data:image/png;base64," + data.imagem;
+                img.alt = "Gráfico gerado";
+                img.style.maxWidth = "100%";
+                respostaDiv.appendChild(img);
+            } else {
+                respostaDiv.textContent = "Erro: " + data.erro;
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao buscar gráfico:", error);
+        });
+     } else if(estatisticaSelecionadaJ === "media_ppg_ctime") {
+      fetch("http://127.0.0.1:5000/grafico", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nome: nomeJogador,
+                tipo:"jogador",
+                opt: "media_ppg_ctime"
             })
         })
         .then(response => response.json())
@@ -65,7 +125,6 @@ jogadorButton.addEventListener("click", () => {
             console.error("Erro ao buscar gráfico:", error);
         });
     } else {
-        // Chama o endpoint de estatísticas normais
         fetch("http://127.0.0.1:5000/jogador", {
             method: "POST",
             headers: {
