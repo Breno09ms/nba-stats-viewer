@@ -26,9 +26,10 @@
         <h2>Escolha uma estatísica do jogador:</h2>
         <select id="select-estatistica-jogador">
             <option value="">SELECIONE</option>
-            <option value="media_ppg_ctime">Média de Pontos por jogo contra cada time</option>
-            <option value="media_tov_ctime">Média de Turnovers contra cada time</option>
-            <option value="ppg_ptemporada">Gráfico de PPG por temporada</option>
+            <option value="media_ppg_ctime">Média de Pontos por jogo contra cada time (Temporada atual)</option>
+            <option value="media_tov_ctime">Média de Turnovers contra cada time (Temporada atual)</option>
+            <option value="ppg_grafico">Gráfico de PPG por temporada</option>
+            <img id="graficoImagem" style="max-width: 100%;" />
         </select>
         <br>
         <button>Mostrar Estatísicas</button>
@@ -70,8 +71,7 @@
         <h2>Escolha uma opção de estatísicas do time:</h2>
         <select id="select-estatistica-time">
             <option value="">SELECIONE</option>
-            <option value="vitorias_fora_dentro_casa">Vitórias Fora x Dentro de casa</option>
-            <option value="vitorias_por_temporada">Vitórias por temporada</option>
+            <option value="vitorias_por_temporada">Vitórias por temporada regular</option>
             <option value="derrotas_time">Derrotas contra cada time</option>
             <option value="vitorias_time">Vitórias contra cada time</option>
         </select>

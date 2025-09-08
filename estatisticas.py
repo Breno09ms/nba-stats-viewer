@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as mp
+import matplotlib.pyplot as plt
 import nba_api as nba
+import io
+import base64
 from nba_api.stats.static import players
+from nba_api.stats.static import teams
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import TeamYearByYearStats
 
 
 #Função pegar média de pontos contra cada time
@@ -39,13 +43,19 @@ def grafico_contra_times(nome_atleta):
     if media_por_time is not None:
       dataf = media_por_time.reset_index()
       dataf.sort_values("OPPONENT", inplace=True)
-      mp.bar(dataf["OPPONENT"],dataf["PTS"])
-      mp.xlabel("teste x")
-      mp.ylabel("teste y")
-      mp.title("Teste Título")
-      mp.tight_layout()
-      mp.show()
+      fig, ax = plt.subplots(figsize=(12,6))
+      ax.bar(dataf["OPPONENT"],dataf["PTS"])
+      ax.set_xlabel("TIMES")
+      ax.set_ylabel("Número de PPG")
+      ax.set_title("Média de TOV contra cada time (Temporada Regular Atual)")
+      plt.tight_layout()
 
+      buf = io.BytesIO()
+      fig.savefig(buf, format="png")
+      buf.seek(0)
+      imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+      plt.close(fig)
+      return imagem_base64
 
 
 #Função pegar média de Turnovers contra cada time
@@ -79,13 +89,19 @@ def tov_grafico_contra_times(nome_atleta):
     if tovmedia_por_time is not None:
        dataf = tovmedia_por_time.reset_index()      
        dataf.sort_values("OPPONENT", inplace=True)
-       mp.bar(dataf["OPPONENT"],dataf["TOV"])
-       mp.xlabel("teste x")
-       mp.ylabel("teste y")
-       mp.title("Teste Título")
-       mp.tight_layout()
-       mp.show()
+       fig, ax = plt.subplots(figsize=(12,6))
+       ax.bar(dataf["OPPONENT"],dataf["TOV"])
+       ax.set_xlabel("TIMES")
+       ax.set_ylabel("Número de Turnovers")
+       ax.set_title("Média de TOV contra cada time (Temporada Regular Atual)")
+       plt.tight_layout()
 
+       buf = io.BytesIO()
+       fig.savefig(buf, format="png")
+       buf.seek(0)
+       imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+       plt.close(fig)
+       return imagem_base64
 
  #Função pegar PPG por temporada
 def ppg_per_season(nome_jogador,salvar_csv=False):
@@ -98,7 +114,7 @@ def ppg_per_season(nome_jogador,salvar_csv=False):
     carreira = playercareerstats.PlayerCareerStats(player_id=player_id)
     df = carreira.get_data_frames()[0]
 
-    # 3. Filtrar só temporadas da temporada regular
+    #Filtrar 
     df_regular = df[df["LEAGUE_ID"] == "00"]  # "00" = NBA
     df_regular = df_regular[df_regular["SEASON_ID"].str.contains("-")]
 
@@ -108,26 +124,73 @@ def ppg_per_season(nome_jogador,salvar_csv=False):
 
     #Salvar CSV
     if salvar_csv:
-        resultado.to_csv(f"{nome_jogador.replace(' ', '_')}_ppg_por_season.csv")
+        resultado.to_csv(f"{nome_jogador.replace(' ', '_')}_ppg_por_season.csv", index = False)
 
     return resultado.reset_index(drop=True)
 
 # Função gráfico PPG por temporada
 def ppg_grafico_season(nome_atleta, salvar_csv=False):
-    nome_atleta_csv = nome_atleta.replace(" ", "_")
-    dataf = pd.read_csv(f"{nome_atleta_csv}_ppg_por_season.csv")
+    dataf = ppg_per_season(nome_atleta)    
 
     # Ordenar cronologicamente pelas temporadas
     dataf["ANO_INICIAL"] = dataf["SEASON_ID"].apply(lambda x: int(x[:4]))
     dataf = dataf.sort_values("ANO_INICIAL")
 
-    # Plot
-    mp.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
-    mp.xlabel("Temporada")
-    mp.ylabel("PPG")
-    mp.title(f"PPG por temporada - {nome_atleta}")
-    mp.xticks(rotation=45)
-    mp.grid(True)
-    mp.tight_layout()
-    mp.show()
+    
+    fig, ax = plt.subplots()
+    ax.plot(dataf["SEASON_ID"], dataf["PPG"], marker="o", linestyle="-", color="blue")
+    ax.set_xlabel("Temporada")
+    ax.set_ylabel("PPG")
+    ax.set_title(f"PPG por temporada - {nome_atleta}")
+    plt.xticks(rotation=45)
+    ax.grid(True)
+    fig.tight_layout()
 
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return imagem_base64
+
+# Função gráfico Vitórias Temporada Regular
+
+def win_seasons(nome_time):
+    time = teams.find_teams_by_full_name(nome_time)
+    if not time:
+         print("Time não encontrado")
+         return
+    
+    team_id = time[0]["id"]
+    team_stats = TeamYearByYearStats(team_id=team_id)
+    df_regular = team_stats.get_data_frames()[0]
+
+    df_regular = df_regular[["YEAR","WINS","LOSSES"]]
+
+    fig, ax = plt.subplots()
+    plt.plot(df_regular["YEAR"],df_regular["WINS"])
+    ax.plot(df_regular["YEAR"],df_regular["LOSSES"], color="red")
+    plt.xlabel("TEMPORADA")
+    plt.ylabel("VITÓRIAS")
+    ax.set_xticks(ax.get_xticks()[::5])
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    ax.grid(axis="y")
+    
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    imagem_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig) 
+    return imagem_base64
+
+
+
+def win_ateams(nome_time):
+    time = teams.find_teams_by_full_name(nome_time)
+    
+    taotimoporhoje = 0
+    team_id = time(00)["id"]
+    return taotimoporhoje
+
+     
